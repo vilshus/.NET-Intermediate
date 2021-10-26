@@ -9,12 +9,16 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AsyncAwait.Task1.CancellationTokens
 {
     class Program
     {
         private static CancellationTokenSource _cancellationTokenSource;
+
+        // This is used to ensure that the cancellation of the previous calculation task is completed before starting the new calculation task.
+        private static readonly AutoResetEvent CalculationTaskSynchronization = new AutoResetEvent(true);
 
         /// <summary>
         /// The Main method should not be changed at all.
@@ -49,25 +53,31 @@ namespace AsyncAwait.Task1.CancellationTokens
             Console.ReadLine();
         }
 
-        private static async void CalculateSum(int n)
+        private static void CalculateSum(int n)
         {
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource = new CancellationTokenSource();
 
-            try
+            Task.Run(async () =>
             {
-                Console.WriteLine();
-                Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
-                long sum = await Calculator.CalculateAsync(n, _cancellationTokenSource.Token);
-                Console.WriteLine($"Sum for {n} = {sum}.");
-                Console.WriteLine();
-                Console.WriteLine("Enter N: ");
-            }
-            catch (OperationCanceledException)
-            {
-                Console.WriteLine($"Sum for {n} cancelled...");
-                Console.WriteLine();
-            }
+                try
+                {
+                    // Time  out of 1sec is used ensure that no matter what the new task will be launched.
+                    CalculationTaskSynchronization.WaitOne(1000);
+                    Console.WriteLine();
+                    Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
+                    long sum = await Calculator.CalculateAsync(n, _cancellationTokenSource.Token);
+                    Console.WriteLine($"Sum for {n} = {sum}.");
+                    Console.WriteLine();
+                    Console.WriteLine("Enter N: ");
+                    CalculationTaskSynchronization.Set();
+                }
+                catch (OperationCanceledException)
+                {
+                    Console.WriteLine($"Sum for {n} cancelled...");
+                    CalculationTaskSynchronization.Set();
+                }
+            });
         }
     }
 }
