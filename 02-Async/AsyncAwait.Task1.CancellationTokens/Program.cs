@@ -53,7 +53,7 @@ namespace AsyncAwait.Task1.CancellationTokens
             Console.ReadLine();
         }
 
-        private static async void CalculateSum(int n)
+        private static async Task CalculateSum(int n)
         {
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource = new CancellationTokenSource();
