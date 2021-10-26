@@ -53,31 +53,28 @@ namespace AsyncAwait.Task1.CancellationTokens
             Console.ReadLine();
         }
 
-        private static void CalculateSum(int n)
+        private static async void CalculateSum(int n)
         {
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource = new CancellationTokenSource();
 
-            Task.Run(async () =>
+            try
             {
-                try
-                {
-                    // Time  out of 1sec is used ensure that no matter what the new task will be launched.
-                    CalculationTaskSynchronization.WaitOne(1000);
-                    Console.WriteLine();
-                    Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
-                    long sum = await Calculator.CalculateAsync(n, _cancellationTokenSource.Token);
-                    Console.WriteLine($"Sum for {n} = {sum}.");
-                    Console.WriteLine();
-                    Console.WriteLine("Enter N: ");
-                    CalculationTaskSynchronization.Set();
-                }
-                catch (OperationCanceledException)
-                {
-                    Console.WriteLine($"Sum for {n} cancelled...");
-                    CalculationTaskSynchronization.Set();
-                }
-            });
+                // Time  out of 1sec is used ensure that no matter what the new task will be launched.
+                await Task.Run(() => CalculationTaskSynchronization.WaitOne(1000));
+                Console.WriteLine();
+                Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
+                long sum = await Calculator.CalculateAsync(n, _cancellationTokenSource.Token);
+                Console.WriteLine($"Sum for {n} = {sum}.");
+                Console.WriteLine();
+                Console.WriteLine("Enter N: ");
+                CalculationTaskSynchronization.Set();
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine($"Sum for {n} cancelled...");
+                CalculationTaskSynchronization.Set();
+            }
         }
     }
 }
