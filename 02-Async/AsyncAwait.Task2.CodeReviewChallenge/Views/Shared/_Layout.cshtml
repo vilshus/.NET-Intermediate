@@ -1,6 +1,6 @@
 ﻿@using AsyncAwait.Task2.CodeReviewChallenge.Headers
 @{
-    string visitsCount = Context.Response.Headers[CustomHttpHeaders.TotalPageVisits];
+    string path = Context.Request.Path;
 }
 <!DOCTYPE html>
 <html>
@@ -40,7 +40,11 @@
         @RenderBody()
         <hr />
         <footer>
-            <h3>This page has been visited <b style="color: darkorange">@visitsCount</b> time(-s) since the launch of the service.</h3>
+            <div class="Statistics">
+                <div class="partialContents" data-url="/Home/Statistics" data-path=@path>
+                    Statistics Loading...
+                </div>
+            </div>
             2019 - AsyncAwait.CodeReviewChallenge - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </footer>
     </div>

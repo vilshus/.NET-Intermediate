@@ -56,7 +56,7 @@ namespace AsyncAwait.CodeReviewChallenge
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseStatistic();
+            //app.UseStatistic();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
