@@ -9,7 +9,7 @@ namespace SharedLibs
 {
     public class FileUploadCommunicationService : IFileUploadedMessageSender, IFileUploadedMessageReceiver
     {
-        //TODO add Azure blob storage connection string here
+        //TODO add Azure service bus connection string here
         private const string ConnectionString = "";
 
         private const string TopicName = "fileprocessing";

@@ -9,7 +9,7 @@ namespace SharedLibs
 {
     public class FilePersistenceService : IFileUploader, IFileDownloader
     {
-        //TODO add Azure service bus connection string here
+        //TODO add Azure blob storage connection string here
         private const string ConnectionString = "";
 
         private const string BlobContainer = "shared-blob";
