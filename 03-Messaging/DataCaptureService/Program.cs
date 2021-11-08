@@ -13,7 +13,7 @@ namespace DataCaptureService
             var filePersistenceService = new FilePersistenceService();
             var communicationService = new FileUploadCommunicationService();
             _dataCaptureService = new DataCaptureService(filePersistenceService, communicationService);
-            Task.Run(() => _dataCaptureService.StartService());
+            Task.Factory.StartNew( () => _dataCaptureService.StartService(), TaskCreationOptions.LongRunning);
 
             Console.ReadLine();
             Console.WriteLine("Finished");
