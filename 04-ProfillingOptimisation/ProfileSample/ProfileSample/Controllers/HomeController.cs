@@ -15,7 +15,7 @@ namespace ProfileSample.Controllers
         {
             var context = new ProfileSampleEntities();
 
-            var model = context.ImgSources.Take(20).Select(x => new ImageModel { Name = x.Name, Data = x.Data }).ToList();
+            var model = context.ImgSources.Take(20).Select(x => new ImageModel { Name = x.Name }).ToList();
 
             return View(model);
         }
