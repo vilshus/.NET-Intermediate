@@ -38,8 +38,7 @@ namespace GameOfLife
 
             SetRandomPattern();
             InitCellsVisuals();
-            UpdateGraphics();
-            
+
         }
 
 
@@ -55,13 +54,15 @@ namespace GameOfLife
         }
 
 
+        /*
+        //OLD
         void MouseMove(object sender, MouseEventArgs e)
         {
             var cellVisual = sender as Ellipse;
-            
-            int i = (int) cellVisual.Margin.Left / 5;
-            int j = (int) cellVisual.Margin.Top / 5;
-            
+
+            int i = (int)cellVisual.Margin.Left / 5;
+            int j = (int)cellVisual.Margin.Top / 5;
+
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
@@ -72,8 +73,28 @@ namespace GameOfLife
                     cellVisual.Fill = Brushes.White;
                 }
             }
+        }*/
+
+        //NEW - optimised
+        void MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                var cellVisual = sender as Ellipse;
+
+                int i = (int)cellVisual.Margin.Left / 5;
+                int j = (int)cellVisual.Margin.Top / 5;
+
+                if (!cells[i, j].IsAlive)
+                {
+                    cells[i, j].IsAlive = true;
+                    cells[i, j].Age = 0;
+                    cellVisual.Fill = Brushes.White;
+                }
+            }
         }
 
+        //OLD
         public void UpdateGraphics()
         {
             for (int i = 0; i < SizeX; i++)
@@ -81,6 +102,14 @@ namespace GameOfLife
                     cellsVisuals[i, j].Fill = cells[i, j].IsAlive
                                                   ? (cells[i, j].Age < 2 ? Brushes.White : Brushes.DarkGray)
                                                   : Brushes.Gray;
+        }
+
+        //NEW - slightly optimised
+        public void UpdateCellGraphics(int x, int y)
+        {
+            cellsVisuals[x, y].Fill = cells[x, y].IsAlive
+                ? (cells[x, y].Age < 2 ? Brushes.White : Brushes.DarkGray)
+                : Brushes.Gray;
         }
 
         public void InitCellsVisuals()
@@ -98,9 +127,9 @@ namespace GameOfLife
 
                     cellsVisuals[i, j].MouseMove += MouseMove;
                     cellsVisuals[i, j].MouseLeftButtonDown += MouseMove;
-                 }
-            UpdateGraphics();
-                    
+                    UpdateCellGraphics(i, j);
+                }
+
         }
         
 
@@ -123,9 +152,9 @@ namespace GameOfLife
                 {
                     cells[i, j].IsAlive = nextGenerationCells[i, j].IsAlive;
                     cells[i, j].Age = nextGenerationCells[i, j].Age;
+                    UpdateCellGraphics(i, j);
                 }
 
-            UpdateGraphics();
         }
         
 
