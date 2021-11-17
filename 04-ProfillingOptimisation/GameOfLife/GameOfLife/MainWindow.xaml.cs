@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -9,7 +11,7 @@ namespace GameOfLife
         private Grid mainGrid;
         DispatcherTimer timer;   //  Generation timer
         private int genCounter;
-        private AdWindow[] adWindow;
+        private List<AdWindow> adWindows;
 
 
         public MainWindow()
@@ -25,34 +27,33 @@ namespace GameOfLife
 
         private void StartAd()
         {
-            
+
             {
-                adWindow = new AdWindow[2];
+                adWindows = new List<AdWindow>();
                 for (int i = 0; i < 2; i++)
                 {
-                    if (adWindow[i] == null)
-                    {
-                        adWindow[i] = new AdWindow(this);
-                        adWindow[i].Closed += AdWindowOnClosed;
-                        adWindow[i].Top = this.Top + (330 * i) + 70;
-                        adWindow[i].Left = this.Left + 240;                        
-                        adWindow[i].Show();
-                    }
+                    var adWindow = new AdWindow(this);
+                    adWindow.Closed += AdWindowOnClosed;
+                    adWindow.Top = this.Top + (330 * i) + 70;
+                    adWindow.Left = this.Left + 240;
+                    adWindow.Show();
+                    adWindows.Add(adWindow);
                 }
-                
-                
+
+
             }
         }
 
         private void AdWindowOnClosed(object sender, EventArgs eventArgs)
         {
-            for (int i = 0; i < 2; i++)
+            var adWindow = sender as AdWindow;
+            adWindow.Closed -= AdWindowOnClosed;
+            adWindows.Remove(adWindow);
+
+            if (!adWindows.Any())
             {
-                adWindow[i].Closed -= AdWindowOnClosed;
-                adWindow[i] = null;
+                adWindows = null;
             }
-            
-            
         }
 
 
@@ -83,6 +84,6 @@ namespace GameOfLife
             mainGrid.Clear();
         }
 
-        
+
     }
 }
