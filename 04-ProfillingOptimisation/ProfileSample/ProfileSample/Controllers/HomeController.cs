@@ -13,9 +13,11 @@ namespace ProfileSample.Controllers
     {
         public ActionResult Index()
         {
-            var context = new ProfileSampleEntities();
-
-            var model = context.ImgSources.Take(20).Select(x => new ImageModel { Name = x.Name }).ToList();
+            List<ImageModel> model;
+            using(var context = new ProfileSampleEntities())
+            {
+                model = context.ImgSources.Take(20).Select(x => new ImageModel { Name = x.Name }).ToList();
+            }
 
             return View(model);
         }
