@@ -25,6 +25,22 @@ namespace Expressions.Task3.E3SQueryProvider
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
+            switch (node.Method.Name)
+            {
+                case "Equals":
+                    CreateSimpleQuery(node.Object, node.Arguments[0], "(", ")");
+                    return node;
+                case "StartsWith":
+                    CreateSimpleQuery(node.Object, node.Arguments[0], "(", "*)");
+                    return node;
+                case "EndsWith":
+                    CreateSimpleQuery(node.Object, node.Arguments[0], "(*", ")");
+                    return node;
+                case "Contains":
+                    CreateSimpleQuery(node.Object, node.Arguments[0], "(*", "*)");
+                    return node;
+            }
+
             if (node.Method.DeclaringType == typeof(Queryable)
                 && node.Method.Name == "Where")
             {
@@ -41,29 +57,19 @@ namespace Expressions.Task3.E3SQueryProvider
             switch (node.NodeType)
             {
                 case ExpressionType.Equal:
-                    Expression memberExpression;
-                    Expression constantExpression;
                     if (node.Left.NodeType == ExpressionType.MemberAccess && node.Right.NodeType == ExpressionType.Constant)
-                    {
-                        memberExpression = node.Left;
-                        constantExpression = node.Right;
-                    }
+                        CreateSimpleQuery(node.Left, node.Right, "(", ")");
                     else if (node.Left.NodeType == ExpressionType.Constant && node.Right.NodeType == ExpressionType.MemberAccess)
-                    {
-                        memberExpression = node.Right;
-                        constantExpression = node.Left;
-                    }
+                        CreateSimpleQuery(node.Right, node.Left, "(", ")");
                     else
-                    {
-                        throw new NotSupportedException($"One operand should be constant and second - proper or field.");
-                    }
-
-                    Visit(memberExpression);
-                    _resultStringBuilder.Append("(");
-                    Visit(constantExpression);
-                    _resultStringBuilder.Append(")");
+                        throw new NotSupportedException($"One operand should be constant and second - property or field.");
+                    
                     break;
-
+                case ExpressionType.AndAlso:
+                    Visit(node.Left);
+                    _resultStringBuilder.Append("\nAND\n");
+                    Visit(node.Right);
+                    break;
                 default:
                     throw new NotSupportedException($"Operation '{node.NodeType}' is not supported");
             };
@@ -86,5 +92,13 @@ namespace Expressions.Task3.E3SQueryProvider
         }
 
         #endregion
+
+        private void CreateSimpleQuery(Expression left, Expression right, string appendRightExpressionStart, string appendRightExpressionEnd)
+        {
+            Visit(left);
+            _resultStringBuilder.Append(appendRightExpressionStart);
+            Visit(right);
+            _resultStringBuilder.Append(appendRightExpressionEnd);
+        }
     }
 }

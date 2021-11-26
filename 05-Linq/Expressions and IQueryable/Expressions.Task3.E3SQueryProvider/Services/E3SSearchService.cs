@@ -44,7 +44,7 @@ namespace Expressions.Task3.E3SQueryProvider.Services
             {
                 throw new ArgumentNullException(nameof(finalType));
             }
-            var items = finalType.GetProperty("items");
+            var items = finalType.GetProperty("Items");
             if (items == null)
             {
                 throw new ArgumentNullException(nameof(items));
