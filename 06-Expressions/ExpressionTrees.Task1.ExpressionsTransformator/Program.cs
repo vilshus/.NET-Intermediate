@@ -21,19 +21,29 @@ namespace ExpressionTrees.Task1.ExpressionsTransformer
 
             // todo: feel free to add your code here
             var translator = new IncDecExpressionVisitor();
-            Expression<Func<int, int, int, bool, int>> exp = (x, y, z, add5) => (x - 1) + (y + 1) + (z - 1) + (add5 ? 5 : 0);
-            var translatedExp = translator.Translate(exp, new List<KeyValuePair<string, object>>
+            Expression<Func<int, int, int, bool, int>> lambdaExp = (x, y, z, add5) => (x - 1) + (y + 1) + (z - 1) + (add5 ? 5 : 0);
+            var translatedExp = translator.Transform(lambdaExp, new List<KeyValuePair<string, object>>
             {
                 new KeyValuePair<string, object>("x", 5),
                 new KeyValuePair<string, object>("y", 4),
                 new KeyValuePair<string, object>("z", 7)
             });
 
-            Console.WriteLine($"Original expression: {exp}");
+            Console.WriteLine();
+            Console.WriteLine("Lambda expression conversion:");
+            Console.WriteLine($"Original expression: {lambdaExp}");
             Console.WriteLine($"Translated expression: {translatedExp}");
 
-            var c = ((LambdaExpression)translatedExp).Compile().DynamicInvoke(true);
-            Console.WriteLine($"Result: {c}");
+            var lambdaResult = ((LambdaExpression)translatedExp).Compile().DynamicInvoke(true);
+            Console.WriteLine($"Result: {lambdaResult}");
+
+            Console.WriteLine();
+            Console.WriteLine("Other expression conversion:");
+            var addExp = Expression.Add(Expression.Parameter(typeof(int), "x"), Expression.Constant(1));
+            var translatedExp1 = translator.Transform(addExp);
+            Console.WriteLine($"Original expression: {addExp}");
+            Console.WriteLine($"Translated expression: {translatedExp1}");
+            
 
             Console.ReadLine();
         }

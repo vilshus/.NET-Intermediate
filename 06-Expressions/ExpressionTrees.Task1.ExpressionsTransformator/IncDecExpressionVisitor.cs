@@ -8,18 +8,25 @@ namespace ExpressionTrees.Task1.ExpressionsTransformer
     {
         private IEnumerable<KeyValuePair<string, object>> _parameterValues;
         private List<ParameterExpression> _remainingParameters;
+        private bool _isLambdaExpression;
 
-        public Expression Translate(Expression expression, IEnumerable<KeyValuePair<string, object>> parameterValues)
+        public Expression Transform(Expression expression)
         {
-            if (expression is LambdaExpression lambda)
-            {
-                _parameterValues = parameterValues;
-                _remainingParameters = lambda.Parameters.ToList();
-                var body = Visit(lambda.Body) ?? lambda.Body;
-                return Expression.Lambda(body, _remainingParameters);
-            }
+            _parameterValues = new List<KeyValuePair<string, object>>();
+            _remainingParameters = new List<ParameterExpression>();
+            _isLambdaExpression = false;
 
             return Visit(expression);
+        }
+
+        public Expression Transform(LambdaExpression expression, IEnumerable<KeyValuePair<string, object>> parameterValues)
+        {
+            _parameterValues = parameterValues ?? new List<KeyValuePair<string, object>>();
+            _remainingParameters = expression.Parameters.ToList();
+            _isLambdaExpression = true;
+            
+            var body = Visit(expression.Body) ?? expression.Body;
+            return Expression.Lambda(body, _remainingParameters);
         }
 
         protected override Expression VisitBinary(BinaryExpression node)
@@ -39,7 +46,7 @@ namespace ExpressionTrees.Task1.ExpressionsTransformer
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (_parameterValues.Any(x => x.Key == node.Name))
+            if (_isLambdaExpression && _parameterValues.Any(x => x.Key == node.Name))
             {
                 var parameterToChange = _parameterValues.Single(x => x.Key == node.Name);
                 _remainingParameters.Remove(node);
