@@ -58,8 +58,7 @@ namespace ExpressionTrees.Task1.ExpressionsTransformer
 
         private bool IsIncDecExpression(BinaryExpression node)
         {
-            if (node.Left is ParameterExpression parameter && parameter.IsNumericType() &&
-                node.Right is ConstantExpression constant && constant.Value is int constantValue && constantValue == 1)
+            if (node.Right is ConstantExpression constant && constant.Value is int constantValue && constantValue == 1)
             {
                 return true;
             }
