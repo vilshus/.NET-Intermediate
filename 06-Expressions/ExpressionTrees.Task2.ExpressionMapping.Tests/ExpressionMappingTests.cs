@@ -10,17 +10,16 @@ namespace ExpressionTrees.Task2.ExpressionMapping.Tests
         // todo: add as many test methods as you wish, but they should be enough to cover basic scenarios of the mapping generator
 
         [TestMethod]
-        public void Should_MapMatchingProperties_When_PropertiesCanBeParsed()
+        public void Should_MapMatchingProperties_When_AllPropertiesSameType()
         {
             var mapGenerator = new MappingGenerator();
-            var mapper = mapGenerator.Generate<Foo, Bar>();
+            var mapper = mapGenerator.Generate<Source, Destination>();
 
-            var source = new Foo()
+            var source = new Source()
             {
                 Id = Guid.NewGuid(),
                 Name = "name",
                 Description = "Some description",
-                Value = 5,
                 FooUniqueProperty = "foo"
             };
 
@@ -30,58 +29,50 @@ namespace ExpressionTrees.Task2.ExpressionMapping.Tests
             Assert.AreEqual(source.Id, result.Id, "#2");
             Assert.AreEqual(source.Name, result.Name, "#3");
             Assert.AreEqual(source.Description, result.Description, "#4");
-            Assert.AreEqual((int) source.Value, result.Value, "#5");
-            Assert.IsNull(result.BarUniqueProperty, "#6");
+            Assert.IsNull(result.BarUniqueProperty, "#5");
+        }
+
+        [TestMethod]
+        public void Should_MapProperty_When_PropertyCanBeParsed()
+        {
+            var mapGenerator = new MappingGenerator();
+            var mapper = mapGenerator.Generate<Source, Destination>();
+
+            var source = new Source()
+            {
+                Value = 5
+            };
+
+            var result = mapper.Map(source);
+
+            Assert.AreEqual(5, result.Value);
         }
 
         [TestMethod]
         public void Should_NotThrowException_When_PropertyCannotBeParsed()
         {
             var mapGenerator = new MappingGenerator();
-            var mapper = mapGenerator.Generate<Foo, Bar>();
+            var mapper = mapGenerator.Generate<Source, Destination>();
 
-            var source = new Foo()
+            var source = new Source()
             {
-                Id = Guid.NewGuid(),
-                Name = "name",
-                Description = "Some description",
-                Value = 5.5,
-                FooUniqueProperty = "foo"
+                WrongTypeValue = "test"
             };
 
             var result = mapper.Map(source);
 
-            Assert.IsNotNull(result, "#1");
-            Assert.AreEqual(source.Id, result.Id, "#2");
-            Assert.AreEqual(source.Name, result.Name, "#3");
-            Assert.AreEqual(source.Description, result.Description, "#4");
-            Assert.IsNull(result.Value, "#5");
-            Assert.IsNull(result.BarUniqueProperty, "#6");
+            Assert.IsNull(result.WrongTypeValue);
         }
 
         [TestMethod]
-        public void Should_NotThrowException_When_SourcePropertyIsNull()
+        public void Should_NotThrowException_When_SourceObjectIsNull()
         {
             var mapGenerator = new MappingGenerator();
-            var mapper = mapGenerator.Generate<Foo, Bar>();
+            var mapper = mapGenerator.Generate<Source, Destination>();
 
-            var source = new Foo()
-            {
-                Id = Guid.NewGuid(),
-                Name = null,
-                Description = "Some description",
-                Value = 5.5,
-                FooUniqueProperty = "foo"
-            };
+            var result = mapper.Map(null);
 
-            var result = mapper.Map(source);
-
-            Assert.IsNotNull(result, "#1");
-            Assert.AreEqual(source.Id, result.Id, "#2");
-            Assert.IsNull(result.Name, "#3");
-            Assert.AreEqual(source.Description, result.Description, "#4");
-            Assert.IsNull(result.Value, "#5");
-            Assert.IsNull(result.BarUniqueProperty, "#6");
+            Assert.IsNull(result);
         }
     }
 }

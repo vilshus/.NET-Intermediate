@@ -2,13 +2,14 @@
 
 namespace ExpressionTrees.Task2.ExpressionMapping.Tests.Models
 {
-    internal class Foo
+    internal class Destination
     {
-        // add here some properties
+        // add here some other properties
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public double? Value { get; set; }
-        public string FooUniqueProperty { get; set; }
+        public int? Value { get; set; }
+        public string BarUniqueProperty { get; set; }
+        public int? WrongTypeValue { get; set; }
     }
 }
